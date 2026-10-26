@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 from alert_engine import AlertEngine, AlertHistory
 from config import load_config
 from docker_monitor import DockerMonitor
+from log_api import start_log_api
 from logging_conf import setup_logging
 from rabbit_publisher import publish
 
@@ -47,6 +48,7 @@ def _heartbeat_loop(config, monitor: DockerMonitor) -> None:
             payload = {
                 "type": "heartbeat",
                 "host": config.host_name,
+                "agent_url": config.agent_api_url,
                 "timestamp": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
                 "containers": [
                     {
@@ -131,6 +133,11 @@ def main() -> int:
         return 1
 
     _monitor_ref = monitor
+
+    if config.agent_api_token:
+        start_log_api(config.agent_api_port, config.agent_api_token, monitor._client)
+    else:
+        log.info("AGENT_API_TOKEN no configurado — API de logs desactivada.")
 
     signal.signal(signal.SIGTERM, _handle_signal)
     signal.signal(signal.SIGINT, _handle_signal)

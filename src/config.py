@@ -80,6 +80,9 @@ class AppConfig:
     hub_exchange: str
     hub_routing_key: str
     heartbeat_interval: int
+    agent_api_port: int
+    agent_api_token: str
+    agent_api_url: str  # URL accesible desde el hub, ej: http://192.168.1.10:9092
 
 
 def load_config() -> AppConfig:
@@ -120,4 +123,7 @@ def load_config() -> AppConfig:
         hub_exchange=_optional("HUB_EXCHANGE", "atalaya-monitor-exchange"),
         hub_routing_key=_optional("HUB_ROUTING_KEY", "monitor.events"),
         heartbeat_interval=_optional_int("HEARTBEAT_INTERVAL_SECONDS", 60),
+        agent_api_port=_optional_int("AGENT_API_PORT", 9092),
+        agent_api_token=_optional("AGENT_API_TOKEN", ""),
+        agent_api_url=_optional("AGENT_API_URL", ""),
     )
