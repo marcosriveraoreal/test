@@ -1,0 +1,31 @@
+services:
+  atalaya-agent:
+    build: .
+    container_name: atalaya-agent
+    restart: unless-stopped
+    env_file: .env
+    # Root necesario para leer el socket Docker; el socket está montado :ro (solo lectura)
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - agent-state:/app/state
+    environment:
+      - HUB_EXCHANGE=${HUB_EXCHANGE:-atalaya-monitor-exchange}
+      - HUB_ROUTING_KEY=${HUB_ROUTING_KEY:-monitor.events}
+      - HEARTBEAT_INTERVAL_SECONDS=${HEARTBEAT_INTERVAL_SECONDS:-60}
+    labels:
+      # El agente se excluye a sí mismo de las alertas
+      monitor.skip: "true"
+    healthcheck:
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - "import os,time,sys; age=time.time()-os.path.getmtime('/app/state/heartbeat'); sys.exit(0 if age<120 else 1)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+
+volumes:
+  agent-state:

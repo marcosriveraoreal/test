@@ -1,0 +1,21 @@
+Estimado,
+
+Se ha detectado una incidencia en la infraestructura de contenedores Docker.
+
+  Contenedor:    {{contenedor}}
+  Imagen:        {{imagen}}
+  Tipo de alerta: {{tipo_alerta}}
+  Severidad:     {{severidad}}
+  Fecha y hora:  {{fecha}}
+  Host:          {{host}}
+
+Detalle:
+
+  {{detalle}}
+
+  Código de salida: {{codigo_salida}}
+
+Este mensaje ha sido generado automáticamente por Atalaya Monitor.
+Por favor, no responda a este correo.
+
+Atalaya Mining - Sistemas IT
