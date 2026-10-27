@@ -40,7 +40,11 @@ def _docker_reader(raw_sock, queue: asyncio.Queue, loop: asyncio.AbstractEventLo
 
 
 async def _handle(websocket, auth_token: str, docker_client) -> None:
-    raw_path = getattr(websocket, "path", getattr(websocket, "resource_name", "/"))
+    req = getattr(websocket, "request", None)
+    if req is not None:
+        raw_path = req.path
+    else:
+        raw_path = getattr(websocket, "path", getattr(websocket, "resource_name", "/"))
     container_name, token = _parse_path(raw_path)
 
     if not container_name:
