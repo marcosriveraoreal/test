@@ -12,6 +12,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - agent-state:/app/state
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
     environment:
       - HUB_EXCHANGE=${HUB_EXCHANGE:-atalaya-monitor-exchange}
       - HUB_ROUTING_KEY=${HUB_ROUTING_KEY:-monitor.events}

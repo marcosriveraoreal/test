@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import threading
 from datetime import datetime, timezone
 from typing import Callable, Dict, List, Optional
@@ -10,6 +11,15 @@ import docker
 import docker.errors
 
 log = logging.getLogger(__name__)
+
+
+def _log_size(log_path: str) -> int:
+    if not log_path:
+        return 0
+    try:
+        return os.path.getsize(log_path)
+    except OSError:
+        return 0
 
 
 def _parse_status(container) -> str:
@@ -40,6 +50,7 @@ def _container_info(container) -> dict:
         "restart_count": attrs.get("RestartCount", 0),
         "exit_code": state.get("ExitCode", 0),
         "health": attrs.get("State", {}).get("Health", {}).get("Status", "none"),
+        "log_size_bytes": _log_size(attrs.get("LogPath", "")),
     }
 
 
