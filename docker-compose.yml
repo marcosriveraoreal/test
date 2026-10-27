@@ -8,8 +8,9 @@ services:
     user: root
     ports:
       - "${AGENT_API_PORT:-9092}:${AGENT_API_PORT:-9092}"
+      - "${AGENT_TERMINAL_PORT:-9093}:${AGENT_TERMINAL_PORT:-9093}"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/run/docker.sock:/var/run/docker.sock
       - agent-state:/app/state
     environment:
       - HUB_EXCHANGE=${HUB_EXCHANGE:-atalaya-monitor-exchange}

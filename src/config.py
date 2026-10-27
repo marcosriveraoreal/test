@@ -95,7 +95,9 @@ class AppConfig:
     heartbeat_interval: int
     agent_api_port: int
     agent_api_token: str
-    agent_api_url: str  # URL accesible desde el hub, ej: http://192.168.1.10:9092
+    agent_api_url: str       # URL HTTP accesible desde el hub, ej: http://192.168.1.10:9092
+    agent_terminal_port: int # Puerto WebSocket de terminal
+    agent_terminal_url: str  # URL WS accesible desde el navegador, ej: ws://192.168.1.10:9093
 
 
 def load_config() -> AppConfig:
@@ -162,4 +164,6 @@ def load_config() -> AppConfig:
         agent_api_port=_optional_int("AGENT_API_PORT", 9092),
         agent_api_token=_optional("AGENT_API_TOKEN", ""),
         agent_api_url=_optional("AGENT_API_URL", ""),
+        agent_terminal_port=_optional_int("AGENT_TERMINAL_PORT", 9093),
+        agent_terminal_url=_optional("AGENT_TERMINAL_URL", ""),
     )
