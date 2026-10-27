@@ -47,6 +47,8 @@ async def _handle(websocket, auth_token: str, docker_client) -> None:
         raw_path = getattr(websocket, "path", getattr(websocket, "resource_name", "/"))
     container_name, token = _parse_path(raw_path)
 
+    log.info("Terminal: path=%r container=%r token_ok=%s", raw_path, container_name, token == auth_token)
+
     if not container_name:
         await websocket.send("\r\n\x1b[31mRuta inválida. Usa /terminal/<nombre>\x1b[0m\r\n")
         return
@@ -157,7 +159,7 @@ def start_terminal_api(port: int, token: str, docker_client) -> None:
         try:
             await _handle(websocket, token, docker_client)
         except Exception as exc:
-            log.debug("Terminal WS error: %s", exc)
+            log.warning("Terminal WS error: %s", exc)
         finally:
             log.info("Terminal WS desconectado: %s:%s", remote[0], remote[1])
 
