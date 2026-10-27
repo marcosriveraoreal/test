@@ -15,6 +15,7 @@ from config import load_config
 from docker_monitor import DockerMonitor
 from log_api import start_log_api
 from log_monitor import LogMonitor
+from docker_stats import collect_stats
 from terminal_api import start_terminal_api
 from logging_conf import setup_logging
 from rabbit_publisher import publish
@@ -52,6 +53,7 @@ def _heartbeat_loop(config, monitor: DockerMonitor) -> None:
     while not _stop_event.is_set():
         try:
             containers = monitor.list_containers()
+            stats_map  = collect_stats(monitor._client, containers)
             payload = {
                 "type": "heartbeat",
                 "host": config.host_name,
@@ -66,6 +68,10 @@ def _heartbeat_loop(config, monitor: DockerMonitor) -> None:
                         "status": c["status"],
                         "restart_count": c["restart_count"],
                         "started_at": c["started_at"],
+                        "cpu_pct": stats_map.get(c["id"], {}).get("cpu_pct"),
+                        "mem_pct": stats_map.get(c["id"], {}).get("mem_pct"),
+                        "mem_mb": stats_map.get(c["id"], {}).get("mem_mb"),
+                        "mem_limit_mb": stats_map.get(c["id"], {}).get("mem_limit_mb"),
                     }
                     for c in containers
                 ],
