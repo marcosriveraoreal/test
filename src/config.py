@@ -1,10 +1,14 @@
 """Carga y validación de configuración desde variables de entorno."""
 from __future__ import annotations
 
+import logging
 import os
+import re
 import socket
 from dataclasses import dataclass
 from typing import List
+
+log = logging.getLogger(__name__)
 
 
 class ConfigError(RuntimeError):
@@ -71,10 +75,19 @@ class AlertConfig:
 
 
 @dataclass(frozen=True)
+class LogMonitorConfig:
+    enabled: bool
+    patterns: List[str]   # raw pattern strings; compiled in LogMonitor.__init__
+    cooldown: int         # segundos entre alertas por contenedor
+    max_line_length: int  # truncar líneas largas en el detalle
+
+
+@dataclass(frozen=True)
 class AppConfig:
     host_name: str
     rabbitmq: RabbitMQConfig
     alert: AlertConfig
+    log_monitor: LogMonitorConfig
     log_level: str
     state_dir: str
     hub_exchange: str
@@ -114,10 +127,33 @@ def load_config() -> AppConfig:
         ignore_names=_optional_list("ALERT_IGNORE_CONTAINERS"),
     )
 
+    _raw_patterns = _optional(
+        "LOG_MONITOR_PATTERNS",
+        "ERROR,CRITICAL,Exception,Traceback,FATAL,PANIC",
+    )
+    _valid_patterns: List[str] = []
+    for _p in _raw_patterns.split(","):
+        _p = _p.strip()
+        if not _p:
+            continue
+        try:
+            re.compile(_p)
+            _valid_patterns.append(_p)
+        except re.error as exc:
+            log.warning("LOG_MONITOR_PATTERNS: patrón inválido '%s' ignorado: %s", _p, exc)
+
+    log_monitor = LogMonitorConfig(
+        enabled=_optional_bool("LOG_MONITOR_ENABLED", False),
+        patterns=_valid_patterns,
+        cooldown=_optional_int("LOG_MONITOR_COOLDOWN_SECONDS", 300),
+        max_line_length=_optional_int("LOG_MONITOR_MAX_LINE_LENGTH", 200),
+    )
+
     return AppConfig(
         host_name=_optional("HOST_NAME", socket.gethostname()),
         rabbitmq=rabbitmq,
         alert=alert,
+        log_monitor=log_monitor,
         log_level=_optional("LOG_LEVEL", "INFO"),
         state_dir=_optional("STATE_DIR", "/app/state"),
         hub_exchange=_optional("HUB_EXCHANGE", "atalaya-monitor-exchange"),

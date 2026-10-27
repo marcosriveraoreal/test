@@ -12,29 +12,32 @@ from config import AlertConfig
 
 log = logging.getLogger(__name__)
 
-ALERT_DIED = "died"
-ALERT_OOM = "oom"
+ALERT_DIED      = "died"
+ALERT_OOM       = "oom"
 ALERT_UNHEALTHY = "unhealthy"
-ALERT_HEALTHY = "healthy"
+ALERT_HEALTHY   = "healthy"
 ALERT_CRASHLOOP = "crashloop"
-ALERT_STARTED = "started"
+ALERT_STARTED   = "started"
+ALERT_LOG_ERROR = "log_error"
 
 _LABELS = {
-    ALERT_DIED: "Contenedor terminado inesperadamente",
-    ALERT_OOM: "Memoria agotada (OOM Kill)",
+    ALERT_DIED:      "Contenedor terminado inesperadamente",
+    ALERT_OOM:       "Memoria agotada (OOM Kill)",
     ALERT_UNHEALTHY: "Healthcheck fallido",
-    ALERT_HEALTHY: "Contenedor recuperado",
+    ALERT_HEALTHY:   "Contenedor recuperado",
     ALERT_CRASHLOOP: "Bucle de reinicios detectado",
-    ALERT_STARTED: "Contenedor iniciado",
+    ALERT_STARTED:   "Contenedor iniciado",
+    ALERT_LOG_ERROR: "Error detectado en logs",
 }
 
 _SEVERITY = {
-    ALERT_DIED: "error",
-    ALERT_OOM: "error",
+    ALERT_DIED:      "error",
+    ALERT_OOM:       "error",
     ALERT_UNHEALTHY: "warning",
-    ALERT_HEALTHY: "ok",
+    ALERT_HEALTHY:   "ok",
     ALERT_CRASHLOOP: "critical",
-    ALERT_STARTED: "info",
+    ALERT_STARTED:   "info",
+    ALERT_LOG_ERROR: "warning",
 }
 
 
